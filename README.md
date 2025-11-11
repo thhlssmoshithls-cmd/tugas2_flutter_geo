@@ -8,7 +8,7 @@ Aplikasi ini dibuat menggunakan flutter yang menggunakan Geolocator dan Geocodin
 Manfaatkan fungsi Geolocator.distanceBetween dari Langkah 4.
 1. Buat variabel String? distanceToPNB; di MyHomePageState.
 2. Di dalam startTracking (di dalam .listen()), panggil fungsi untuk menghitung
-jarak:
+jarak: disini saya menghitung jarak dari pasinan(rumah saya)  ke poliwangi
 3. Simpan hasilnya di distanceToPNB menggunakan setState.
 4. Tampilkan distanceToPNB di UI agar jaraknya ter-update secara real-time saat Anda bergerak
 5. Hasil Akhir
