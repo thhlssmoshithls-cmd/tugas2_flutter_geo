@@ -4,10 +4,11 @@
 **Deskripsi**
 Aplikasi ini dibuat menggunakan flutter yang menggunakan Geolocator dan Geocoding packacage untuk mendapatkan lokasi (latitude dan longitude) dan menggubahnya menjadi alamat lengkap.
 
-**Langkah - langkah**
-    1. Tambahkan package Geolocator dan Geocoding di file pubspec.yaml
-    2. Import package Geolocator dan Geocoding di file dart
-    3. Menambahkan variable yang meenyimpan alamat
-    4. Membuat fungsi getAddress 
-    5. Menampilkan alamat di UI
-    6. Hasil Tampilan
+**Tugas 2*: Jarak Real-time ke Titik Tetap
+Manfaatkan fungsi Geolocator.distanceBetween dari Langkah 4.
+1. Buat variabel String? distanceToPNB; di MyHomePageState.
+2. Di dalam startTracking (di dalam .listen()), panggil fungsi untuk menghitung
+jarak:
+3. Simpan hasilnya di distanceToPNB menggunakan setState.
+4. Tampilkan distanceToPNB di UI agar jaraknya ter-update secara real-time saat Anda bergerak
+5. Hasil Akhir

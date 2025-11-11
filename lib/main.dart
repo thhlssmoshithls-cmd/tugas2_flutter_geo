@@ -30,8 +30,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Position? _currentPosition;
   String? _errorMessage;
-  String? _currentAddress; // ✅ Menyimpan alamat hasil geocoding
+  String? _currentAddress;
   StreamSubscription<Position>? _positionStream;
+
+  // Tambahan Tugas 2:
+  String? _distanceToPNB; // Menyimpan jarak ke titik tetap
+  final double pnbLatitude = -8.3129;
+  final double pnbLongitude = 114.2365;
 
   @override
   void dispose() {
@@ -58,7 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (permission == LocationPermission.deniedForever) {
       return Future.error(
-          'Izin lokasi ditolak permanen. Harap ubah di pengaturan aplikasi.');
+        'Izin lokasi ditolak permanen. Harap ubah di pengaturan aplikasi.',
+      );
     }
 
     return await Geolocator.getCurrentPosition(
@@ -66,7 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // Fungsi Geocoding: Konversi koordinat ke alamat
   Future<void> _getAddressFromLatLng(Position position) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -86,7 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Tombol: Dapatkan Lokasi Sekarang
   void _handleGetLocation() async {
     try {
       Position position = await _getPermissionAndLocation();
@@ -94,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentPosition = position;
         _errorMessage = null;
       });
-      await _getAddressFromLatLng(position); // 🔹 Panggil fungsi geocoding
+      await _getAddressFromLatLng(position);
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -102,7 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Tombol: Mulai Lacak Lokasi
   void _handleStartTracking() {
     _positionStream?.cancel();
 
@@ -112,15 +115,29 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     try {
-      _positionStream = Geolocator.getPositionStream(
-        locationSettings: locationSettings,
-      ).listen((Position position) async {
-        setState(() {
-          _currentPosition = position;
-          _errorMessage = null;
-        });
-        await _getAddressFromLatLng(position); // 🔹 Update alamat terus-menerus
-      });
+      _positionStream =
+          Geolocator.getPositionStream(
+            locationSettings: locationSettings,
+          ).listen((Position position) async {
+            setState(() {
+              _currentPosition = position;
+              _errorMessage = null;
+            });
+
+            // Tambahan Tugas 2: Hitung jarak ke titik tetap (PNB)
+            double distanceInMeters = Geolocator.distanceBetween(
+              position.latitude,
+              position.longitude,
+              pnbLatitude,
+              pnbLongitude,
+            );
+
+            setState(() {
+              _distanceToPNB = distanceInMeters.toStringAsFixed(2);
+            });
+
+            await _getAddressFromLatLng(position);
+          });
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -128,7 +145,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Tombol: Henti Lacak
   void _handleStopTracking() {
     _positionStream?.cancel();
     setState(() {
@@ -136,7 +152,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,7 +166,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icon(Icons.location_on, size: 50, color: Colors.blue),
                 SizedBox(height: 16),
 
-                // Area informasi lokasi
                 ConstrainedBox(
                   constraints: BoxConstraints(minHeight: 150),
                   child: Column(
@@ -186,6 +200,20 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
+                        // Tambahan Tugas 2: tampilkan jarak ke PNB
+                        if (_distanceToPNB != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              "Jarak ke PNB: $_distanceToPNB meter",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent,
+                              ),
+                            ),
+                          ),
                       ],
                     ],
                   ),
@@ -193,7 +221,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 SizedBox(height: 32),
 
-                // Tombol Dapatkan Lokasi
                 ElevatedButton.icon(
                   icon: Icon(Icons.location_searching),
                   label: Text('Dapatkan Lokasi Sekarang'),
@@ -204,7 +231,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(height: 16),
 
-                // Tombol Mulai & Henti Lacak
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
