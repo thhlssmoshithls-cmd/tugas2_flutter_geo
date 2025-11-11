@@ -12,3 +12,5 @@ jarak:
 3. Simpan hasilnya di distanceToPNB menggunakan setState.
 4. Tampilkan distanceToPNB di UI agar jaraknya ter-update secara real-time saat Anda bergerak
 5. Hasil Akhir
+![gambar hasil2](https://github.com/user-attachments/assets/15a630da-bf4e-4dfc-9900-7e55ba14cce5)
+
